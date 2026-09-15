@@ -76,7 +76,11 @@
     }
 
     .sidebar-fixed { padding: 32px 32px 16px 32px; }
-    .sidebar h1 { font-size: 22px; margin-bottom: 20px; color: var(--sidebar-text); }
+    
+    .header-row {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+    }
+    .sidebar h1 { font-size: 22px; color: var(--sidebar-text); margin: 0; }
 
     .filter-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .filter-icon { opacity: 0.6; display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; }
@@ -95,23 +99,82 @@
 
     .sidebar-scroll { flex: 1; overflow-y: auto; padding: 0 32px 32px 32px; }
     
+    /* COMPACT 3-LINE TASK CARD */
     .task-card {
-      display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start;
-      padding: 10px 0; border-bottom: 1px solid transparent; position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 6px 0; /* Tight padding to keep the whole card compact */
+      border-bottom: 1px solid transparent;
     }
     .task-card:hover { border-bottom-color: var(--border); }
-    .task-check { margin-top: 2px; width: 12px; height: 12px; accent-color: var(--sidebar-text); cursor: pointer; }
-    .task-card.completed .task-title { opacity: 0.5; text-decoration: line-through; }
-    
-    .task-title { font-weight: bold; font-size: 14px; margin-bottom: 4px; line-height: 1.3; cursor: pointer; }
-    .task-meta-line { font-style: italic; font-size: 11px; display: flex; flex-wrap: wrap; gap: 6px; letter-spacing: 0.2px;}
-    
-    .task-actions { opacity: 0; display: flex; gap: 4px; transition: opacity 0.2s; }
-    .task-card:hover .task-actions { opacity: 1; }
-    .action-icon { padding: 4px; color: var(--sidebar-text); opacity: 0.5; }
+
+    /* Line 1: Actions */
+    .task-actions {
+      display: flex; justify-content: flex-end; gap: 4px;
+      min-height: 18px; /* Reserves space so card doesn't jump on hover */
+      opacity: 0; transition: opacity 0.2s;
+      margin-bottom: 2px;
+    }
+    .task-card:hover .task-actions,
+    .task-card:focus-within .task-actions { opacity: 1; }
+    .action-icon { padding: 2px; color: var(--sidebar-text); opacity: 0.5; }
     .action-icon:hover { opacity: 1; }
     .action-icon.delete-icon:hover { color: var(--danger); opacity: 1; }
     .action-icon svg { width: 14px; height: 14px; stroke-width: 1.5; }
+
+    /* Line 2: Checkbox + Title */
+    .task-main-row {
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    .task-check { margin-top: 1px; width: 12px; height: 12px; accent-color: var(--sidebar-text); cursor: pointer; flex-shrink: 0; }
+    .task-title { font-weight: bold; font-size: 14px; line-height: 1.3; cursor: pointer; }
+    .task-card.completed .task-title { opacity: 0.5; text-decoration: line-through; }
+
+    /* Line 3: Tags */
+    .task-meta-line { 
+      font-style: italic; font-size: 11px; display: flex; flex-wrap: wrap; gap: 6px; letter-spacing: 0.2px;
+      margin-top: 4px; padding-left: 20px; /* Pushes tags past the checkbox to align with text */
+    }
+
+    @media (max-width: 900px) {
+      .task-actions { opacity: 1; }
+      .sidebar { width: 300px; }
+      .sidebar-fixed, .sidebar-scroll { padding-left: 24px; padding-right: 24px; }
+    }
+
+    .sidebar-collapse-btn {
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border: none; padding: 0;
+      color: var(--sidebar-text); opacity: 0.6; border-radius: var(--radius);
+      transition: opacity 0.2s, background 0.2s;
+      font-size: 20px; line-height: 1; cursor: pointer;
+    }
+    .sidebar-collapse-btn:hover { opacity: 1; background: rgba(0,0,0,0.05); }
+
+    .sidebar-reopen {
+      position: absolute; top: 14px; left: 10px;
+      width: 24px; height: 24px;
+      display: none; align-items: center; justify-content: center;
+      background: transparent; border: none; padding: 0;
+      color: var(--sidebar-text); opacity: 0.6; border-radius: var(--radius);
+      transition: opacity 0.2s, background 0.2s;
+      font-size: 20px; line-height: 1; z-index: 2; cursor: pointer;
+    }
+    .sidebar-reopen:hover { opacity: 1; background: rgba(0,0,0,0.05); }
+
+    .body-sidebar-collapsed .sidebar {
+      width: 44px; border-right: 1px solid var(--border); position: relative;
+    }
+    .body-sidebar-collapsed .sidebar > * { display: none; }
+    .body-sidebar-collapsed .sidebar-reopen { display: flex; }
+    .body-sidebar-collapsed .canvas { flex: 1; }
+
+    .last-backup-notice {
+      position: fixed; right: 24px; bottom: 10px;
+      font-size: 11px; color: var(--muted);
+      opacity: 0.9; pointer-events: none; z-index: 20;
+    }
 
     .top-action-bar { display: flex; align-items: center; justify-content: space-between; padding: 32px 40px 16px 40px; border-bottom: 1px solid transparent; flex-shrink: 0; }
     .quick-add-row { flex: 1; max-width: 600px; display: flex; align-items: center; }
@@ -142,9 +205,28 @@
     .kanban-column.collapsed .kanban-counter { display: inline; }
 
     .kanban-tasks-list { flex: 1; overflow-y: auto; overflow-x: hidden; padding-right: 4px; }
-    .kanban-tasks-list::-webkit-scrollbar { width: 4px; }
-    .kanban-tasks-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
-    body.dark-mode .kanban-tasks-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    
+    /* Invisible hover-only scrollbars */
+    .sidebar-scroll::-webkit-scrollbar,
+    .kanban-tasks-list::-webkit-scrollbar,
+    .canvas-scroll::-webkit-scrollbar {
+      width: 6px; height: 6px;
+    }
+    .sidebar-scroll::-webkit-scrollbar-thumb,
+    .kanban-tasks-list::-webkit-scrollbar-thumb,
+    .canvas-scroll::-webkit-scrollbar-thumb {
+      background: transparent; border-radius: 4px; transition: background 0.2s;
+    }
+    .sidebar-scroll:hover::-webkit-scrollbar-thumb,
+    .kanban-tasks-list:hover::-webkit-scrollbar-thumb,
+    .canvas-scroll:hover::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.15);
+    }
+    body.dark-mode .sidebar-scroll:hover::-webkit-scrollbar-thumb,
+    body.dark-mode .kanban-tasks-list:hover::-webkit-scrollbar-thumb,
+    body.dark-mode .canvas-scroll:hover::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+    }
 
     .kanban-column.collapsed .kanban-tasks-list { display: none; }
     .kanban-column.collapsed { padding-bottom: 12px; }
@@ -241,8 +323,13 @@
 <body>
   
   <aside class="sidebar">
+    <button type="button" id="sidebarReopenBtn" class="sidebar-reopen" title="Expand Sidebar" aria-label="Expand Sidebar">›</button>
     <div class="sidebar-fixed">
-      <h1>Offline To-Do</h1>
+      
+      <div class="header-row">
+        <h1>Offline To-Do</h1>
+        <button type="button" id="sidebarCollapseBtn" class="sidebar-collapse-btn" title="Collapse Sidebar" aria-label="Collapse Sidebar">‹</button>
+      </div>
       
       <div class="filter-group">
         <span class="filter-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></span>
@@ -401,12 +488,15 @@
 
   <input id="importFileInput" type="file" accept=".json,application/json" hidden>
   <div id="statusToast"></div>
+  <div id="lastBackupNotice" class="last-backup-notice"></div>
 
   <script>
     (function () {
       "use strict";
 
       const STORAGE_KEY = "offline-todo.tasks.v3";
+      const LAST_BACKUP_KEY = "offline-todo.lastBackup";
+      const SIDEBAR_COLLAPSED_KEY = "offline-todo.sidebarCollapsed";
       const LEGACY_V2_KEY = "offline-todo.tasks.v2";
       const LEGACY_V1_KEY = "offline-todo.tasks.v1";
       const THEME_KEY = "offline-todo.theme.v2";
@@ -462,6 +552,26 @@
       const storageGet = (k) => { try { return window.localStorage.getItem(k); } catch(e) { return null; } };
       const storageSet = (k, v) => { try { window.localStorage.setItem(k, v); } catch(e) {} };
       const makeId = () => "task-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+
+      function formatBackupDate(iso) {
+        if (!iso) return "Never";
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return "Never";
+        return new Intl.DateTimeFormat('en-US', {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: 'numeric', minute: '2-digit'
+        }).format(d);
+      }
+
+      function renderLastBackupNotice() {
+        const el = document.getElementById("lastBackupNotice");
+        if (el) el.textContent = "Last backup: " + formatBackupDate(storageGet(LAST_BACKUP_KEY));
+      }
+
+      function setSidebarCollapsed(collapsed) {
+        document.body.classList.toggle("body-sidebar-collapsed", collapsed);
+        storageSet(SIDEBAR_COLLAPSED_KEY, collapsed ? "true" : "false");
+      }
       const escapeHtml = (val) => String(val).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
       const parseDateOnly = (val) => /^\d{4}-\d{2}-\d{2}$/.test(val) ? new Date(...val.split("-").map((v, i) => i === 1 ? v - 1 : Number(v))) : null;
       
@@ -620,17 +730,21 @@
         const meta = formatMetaHtml(t);
         return `
           <div class="task-card ${t.completed ? 'completed' : ''}" data-task-id="${t.id}">
-            <input type="checkbox" class="task-check" data-action="toggle" ${t.completed ? 'checked' : ''}>
-            <div style="flex:1;">
-              <div class="task-title" data-action="view">${escapeHtml(t.title)}</div>
-              ${meta ? `<div class="task-meta-line">${meta}</div>` : ''}
-            </div>
+            
             <div class="task-actions">
               <button type="button" class="action-icon" data-action="view" title="View">${svgs.view}</button>
               <button type="button" class="action-icon" data-action="edit" title="Edit">${svgs.edit}</button>
               <button type="button" class="action-icon" data-action="duplicate" title="Duplicate">${svgs.duplicate}</button>
               <button type="button" class="action-icon delete-icon" data-action="delete" title="Delete">${svgs.delete}</button>
             </div>
+
+            <div class="task-main-row">
+              <input type="checkbox" class="task-check" data-action="toggle" ${t.completed ? 'checked' : ''}>
+              <div class="task-title" data-action="view">${escapeHtml(t.title)}</div>
+            </div>
+
+            ${meta ? `<div class="task-meta-line">${meta}</div>` : ''}
+
           </div>`;
       };
 
@@ -999,8 +1113,21 @@
       document.addEventListener("click", (e) => { if (!e.target.closest('.popover') && !e.target.closest('.icon-btn')) document.querySelectorAll('.popover').forEach(p => p.classList.remove('active')); });
 
       document.getElementById("exportBtn").onclick = () => {
-        const url = URL.createObjectURL(new Blob([JSON.stringify({ app: "Offline To-Do", version: 3, exportedAt: new Date().toISOString(), tasks }, null, 2)], {type: "application/json"}));
-        const a = document.createElement("a"); a.href = url; a.download = "offline-todo-backup.json"; document.body.appendChild(a); a.click(); a.remove();
+        const exportedAt = new Date();
+        const stamp = [
+          exportedAt.getFullYear(),
+          String(exportedAt.getMonth() + 1).padStart(2, '0'),
+          String(exportedAt.getDate()).padStart(2, '0'),
+          '-',
+          String(exportedAt.getHours()).padStart(2, '0'),
+          String(exportedAt.getMinutes()).padStart(2, '0'),
+          String(exportedAt.getSeconds()).padStart(2, '0')
+        ].join('');
+        const url = URL.createObjectURL(new Blob([JSON.stringify({ app: "Offline To-Do", version: 3, exportedAt: exportedAt.toISOString(), tasks }, null, 2)], {type: "application/json"}));
+        const a = document.createElement("a"); a.href = url; a.download = `offline-todo-backup-${stamp}.json`; document.body.appendChild(a); a.click(); a.remove();
+        storageSet(LAST_BACKUP_KEY, exportedAt.toISOString());
+        renderLastBackupNotice();
+        setTimeout(() => URL.revokeObjectURL(url), 0);
       };
       
       const importInput = document.getElementById("importFileInput");
@@ -1033,6 +1160,12 @@
 
       try { pinnedLabels = JSON.parse(storageGet(PINNED_LABELS_KEY) || '[]'); } catch(e){}
       try { collapsedBlocks = JSON.parse(storageGet(COLLAPSED_LABELS_KEY) || '[]'); } catch(e){}
+
+      document.getElementById("sidebarCollapseBtn").onclick = () => setSidebarCollapsed(true);
+      document.getElementById("sidebarReopenBtn").onclick = () => setSidebarCollapsed(false);
+      setSidebarCollapsed(storageGet(SIDEBAR_COLLAPSED_KEY) === "true");
+      renderLastBackupNotice();
+
       initThemes();
       tasks = loadTasks();
       if (!storageGet(STORAGE_KEY)) saveTasks();
